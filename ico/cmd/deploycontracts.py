@@ -10,6 +10,7 @@ from ico.deploy import deploy_crowdsale_from_file
 @click.option('--deployment-name', nargs=1, default="mainnet", help='Project section id inside the YAML file. The topmost YAML key. Example YAML files use "mainnet" or "kovan".', required=True)
 @click.option('--deployment-file', nargs=1, help='Deployment script YAML .yml file to process', required=True)
 @click.option('--address', nargs=1, help='Your Ethereum account that is the owner of deployment and pays the gas cost. This account must exist on Ethereum node we connect to. Connection parameteres, port and IP, are defined in populus.json.', required=True)
+
 def main(deployment_file, deployment_name, address):
     """Makes a scripted multiple contracts deployed based on a YAML file.
 
@@ -26,9 +27,14 @@ def main(deployment_file, deployment_name, address):
     """
 
     project = Project()
+    tweak_chain(project, deployment_name) # <-- here we go!
     deploy_crowdsale_from_file(project, deployment_file, deployment_name, address)
     print("All done! Enjoy your decentralized future.")
 
+
+def tweak_chain(project, deployment_name):
+    with project.get_chain(deployment_name) as chain:
+        chain.wait.timeout = 9999
 
 if __name__ == "__main__":
     main()

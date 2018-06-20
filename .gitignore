@@ -93,3 +93,7 @@ csvs
 
 # Created by pytest
 .pytest_cache
+#password.txt#
+.DS_Store
+password.txt
+password-2.txt

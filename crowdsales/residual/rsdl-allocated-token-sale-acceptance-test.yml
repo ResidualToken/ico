@@ -1,7 +1,7 @@
 # Used in test_deploy_acceptance.py, corresponding to allocated-token-sale-example.yml
 #
 # Please note that some numbers are slightly changed.
-# 100,000,000,000
+#
 
 testrpc:
 
@@ -42,7 +42,7 @@ testrpc:
         team_multisig:
             contract_name: MultiSigWallet
             contract_file: GnosisWallet.sol
-            address: "0xae52aab13eecb9361d71059a62a2e4b06a675a2f"
+            address: "0x40a05d4ce308bf600cb275d7a3e9113518f59c54"
         #
         # Token contract
         #

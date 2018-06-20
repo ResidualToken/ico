@@ -1,0 +1,184 @@
+
+    # This is the chain name in populus.json
+    # In the default configuration this Ethereum JSON-RPC in port 8547.
+    # Edit populus.json to change the port.
+    # You can run Parity as:
+    # parity \
+    #   --chain=kovan \
+    #   --unlock [My deploy account on Parity] \
+    #   --jsonrpc-port 8547 \
+    #   --password=password.txt
+    #
+    # password.txt must contain your Parity Kovan account unlock password
+chain: kovan
+
+    # Use automated Chrome to verify all contracts on etherscan.io
+verify_on_etherscan: no
+browser_driver: chrome
+
+solc:
+
+        # This is the Solidity version tag we verify on EtherScan.
+        # For available versions see
+        # https://kovan.etherscan.io/verifyContract2
+        #
+        # See values in Compiler drop down.
+        # You can also get the local compiler version with:
+        #
+        #     solc --version
+        #
+        # Note that for EtherScan you need to add letter "v" at the front of the version
+        #
+        # Note: You need to have correct optmization settings for the compiler
+        # in populus.json that matches what EtherScan is expecting.
+        #
+  version: 0.4.24+commit.e67f0147.Darwin.appleclang
+
+        #
+        # We supply these to EtherScan as the solc settings we used to compile the contract.
+        # They must match values in populus.json compilication / backends section.
+        #
+  optimizations:
+    optimizer: true
+    runs: 500     
+
+contracts:
+        # This is the address of the multisig wallet where the paymnts eventually land
+  team_multisig:
+    contract_name: MultiSigWallet
+    contract_file: GnosisWallet.sol
+    address: '0xae52aab13eecb9361d71059a62a2e4b06a675a2f'
+        #
+        # Token contract
+        #
+        # This contract represents ERC-20 token.
+        # It has transfer lock up functionality to prevent the token to be transferable
+        # until the ICO is over.
+        #
+        # We create the whole token supply upfront and no more token minting
+        # happens ever.
+        #
+        # Token has 18 decimals and supply of 1B tokens.
+        #
+        # Token supply is one billion tokens.
+        #
+        # Name and symbol are not set yet. They are set later. In
+        # the case of the deployment fails and we need redeploy
+        # we do not create unnecessary entries in token explorers.
+        #
+  token: !!omap
+  - contract_name: BurnableCrowdsaleToken
+  - contract_file: BurnableCrowdsaleToken.sol
+  - arguments: !!omap
+    - _name: ''
+    - _symbol: ''
+    - _initialSupply: 10000000000000000000000000
+    - _decimals: 18
+    - _mintable: false
+  - address: '0xdf3f12e0b99495d634f2137c7fa66d1c59233a6c'
+  - constructor_args: '0x00000000000000000000000000000000000000000000000000000000000000a000000000000000000000000000000000000000000000000000000000000000e0000000000000000000000000000000000000000000084595161401484a000000000000000000000000000000000000000000000000000000000000000000001200000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000'
+  - libraries:
+      SafeMathLib: '0x52baf9eb793d450c2c82ff9f33e8e7ce14227101'
+        #
+        # Pricing strategy.
+        #
+        # We use ETH tranches. People who buy in in the first
+        # tranches get 20% and 10% bonus tokens.
+        #
+  pricing_strategy: !!omap
+  - contract_name: EthTranchePricing
+  - contract_file: EthTranchePricing.sol
+  - arguments: !!omap
+    - _tranches:
+      - 0
+      - 3000000000000000
+      - 1500000000000000000000
+      - 3400000000000000
+      - 1700000000000000000000
+      - 4000000000000000
+      - 999999999999999000000000000000000
+      - 0
+  - address: '0x55d6d181bb2da25b65634dc7e63408d05b0184fd'
+  - constructor_args: '0x000000000000000000000000000000000000000000000000000000000000002000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000aa87bee53800000000000000000000000000000000000000000000000005150ae84a8cdf00000000000000000000000000000000000000000000000000000000c1448303c800000000000000000000000000000000000000000000000005c283d410394100000000000000000000000000000000000000000000000000000000e35fa931a0000000000000000000000000000000000000000314dc6448d932ae0a456589c00000000000000000000000000000000000000000000000000000000000000000000'
+  - libraries:
+      SafeMathLib: '0x5c809f35228acc239eb2a224183b5c962c24eb29'
+  crowdsale: !!omap
+  - contract_name: AllocatedCrowdsale
+  - contract_file: AllocatedCrowdsale.sol
+  - arguments: !!omap
+    - _token: '0xdf3f12e0b99495d634f2137c7fa66d1c59233a6c'
+    - _pricingStrategy: '0x55d6d181bb2da25b65634dc7e63408d05b0184fd'
+    - _multisigWallet: '0xae52aab13eecb9361d71059a62a2e4b06a675a2f'
+    - _start: 1529499600
+    - _end: 1529672400
+    - _minimumFundingGoal: 2000000000000000000000
+    - _beneficiary: '0x3e3c4504a59d1f35dedc9b079dbbd51275ee1a6b'
+  - address: '0x3bfb37fde9bf11923de51d50e58c67a6675040c2'
+  - constructor_args: '0x000000000000000000000000df3f12e0b99495d634f2137c7fa66d1c59233a6c00000000000000000000000055d6d181bb2da25b65634dc7e63408d05b0184fd000000000000000000000000ae52aab13eecb9361d71059a62a2e4b06a675a2f000000000000000000000000000000000000000000000000000000005b2a4fd0000000000000000000000000000000000000000000000000000000005b2cf2d000000000000000000000000000000000000000000000006c6b935b8bbd4000000000000000000000000000003e3c4504a59d1f35dedc9b079dbbd51275ee1a6b'
+  - libraries:
+      SafeMathLib: '0xca30bd8e5c15eb51ce3aa26e8357cf8e34178ae3'
+        #
+        # Because deploy_address controls whole supply,
+        # we do not create any supply dynamically,
+        # we do not need a finalizer.
+        #
+  finalize_agent: !!omap
+  - contract_name: NullFinalizeAgent
+  - contract_file: NullFinalizeAgent.sol
+  - arguments: !!omap
+    - _crowdsale: '0x3bfb37fde9bf11923de51d50e58c67a6675040c2'
+  - address: '0x933793bc9592ebef37eb642f5680270d48820e01'
+  - constructor_args: '0x0000000000000000000000003bfb37fde9bf11923de51d50e58c67a6675040c2'
+  - libraries: {}
+
+    # Post-deployment actions connect contracts together.
+post_actions: |2
+
+  # Allow crowdsale contract to sell its token
+  token.transact({"from": deploy_address}).approve(crowdsale.address, 2500000*10**18)
+
+  # Make sure crowdsale contract and these accounts
+  # can transfer tokens despite transfer lock up
+  token.transact({"from": deploy_address}).setTransferAgent(team_multisig.address, True)
+  token.transact({"from": deploy_address}).setTransferAgent(crowdsale.address, True)
+  token.transact({"from": deploy_address}).setTransferAgent(finalize_agent.address, True)
+  token.transact({"from": deploy_address}).setTransferAgent(deploy_address, True)
+
+  # Do not do nothing at the end of the crowdsale
+  confirm_tx(crowdsale.transact({"from": deploy_address}).setFinalizeAgent(finalize_agent.address))
+
+  # Owner can release the token transfer when they fel its the time
+  confirm_tx(token.transact({"from": deploy_address}).setReleaseAgent(deploy_address))
+
+  # Set token upgrade master to team multisig to give the new token path
+  confirm_tx(token.transact({"from": deploy_address}).setUpgradeMaster(team_multisig.address))
+
+  # Allow test buys from these accounts before token sale begins.
+  # The latter one is a presale contract address.
+  # Presale contract (PreICOProxyBuyer) can move in funds
+  # and get tokens before the actual start time.
+  confirm_multiple_txs( \
+    crowdsale.transact({"from": deploy_address}).setEarlyParicipantWhitelist(deploy_address, True), \
+    crowdsale.transact({"from": deploy_address}).setEarlyParicipantWhitelist("0x99084c3A842d5EbBDFd172Ea6FedbD4B3BAA0cFD", True) \
+  )
+
+  # We set a special price, outside ETH tranches, for a presale contract
+  confirm_tx(pricing_strategy.transact({"from": deploy_address}).setPreicoAddress("0x6d997eDcA04282950416FA380d834f360fC36eBb", 2083333333333))
+
+# Sanity check
+verify_actions: |
+  assert token.call().owner().lower() == deploy_address.lower()
+  assert token.call().released() == False
+  assert crowdsale.call().owner().lower() == deploy_address.lower()
+  assert crowdsale.call().multisigWallet().lower() == team_multisig.address.lower()
+  assert finalize_agent.call().isSane()
+  assert crowdsale.call().getState() == CrowdsaleState.PreFunding   # PreFunding for the final, as it is deployed pre-opening
+
+  # Do a test buy using a test address.
+  # This ensures are variables are set and the
+  # funds flow in the multisig wallet.
+  confirm_tx(crowdsale.transact({"from": deploy_address, "value": to_wei("0.01", "ether")}).buy())
+
+  # As the last action, after successful deployment, set the right token symbol and name so that it shows in a blockchain explorer
+  confirm_tx(token.transact({"from": deploy_address}).setTokenInformation("RDSLLToken", "RDSLL"))
+deploy_address: '0x3e3c4504a59d1f35dedc9b079dbbd51275ee1a6b'

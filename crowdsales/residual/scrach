@@ -1,0 +1,9 @@
+deploy-contracts \
+   --address=[0x2671e819128bf6c0872218e19b5b6e79e8ac84e3 \¨
+   --deployment-file=crowdsales/allocated-token-sale-example.yml \
+   --deployment-name=kovan
+
+
+
+
+   

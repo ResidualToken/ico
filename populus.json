@@ -57,9 +57,9 @@
         "provider": {
           "class": "web3.providers.rpc.HTTPProvider",
           "settings": {
-            "endpoint_uri": "http://localhost:8547",
+            "endpoint_uri": "http://192.168.0.14:8547",
             "request_kwargs": {
-                "timeout": 180
+                "timeout": 380
             }
           }
         }
